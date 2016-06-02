@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+    <!-- JS Libraries -->
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js">
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.min.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js" type="text/javascript"></script>
+
+    <script src="js/services.js"></script>
+    <script src="js/application.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+    <style>
+
+    </style>
+</head>
+
+
+<body>
+
+    <div ng-controller="MainCtrlGenre">
+        <div>
+            <table align="center" border="0" height="50%" class="table">
+                <tr>
+                    <td style="text-align: center;">
+                        <label style="font-size:25px;font-family:comic sans ms;font-weight:bold;">Genres</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <input type="search" ng-model="search.name" style="width:200px;" placeholder="Search Genre">
+                    </td>
+                </tr>
+                <tr data-target="#genreEditModal" data-toggle="modal" ng-repeat="genre in filtered = genreInfo | filter:search | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit" style="cursor:pointer;" ng-click="invokeGenre(genre.id,genre.name)">
+                    <td style="color:black;font-family:comic sans ms;font-size:15px;position:relative;left:35em;">{{genre.name}}
+
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td align="center">
+                        <input type="button" id="btnAdd" data-target="#addGenreModal" data-toggle="modal" value="Add New Genre" style="width:200px;">
+                    </td>
+                </tr>
+
+            </table>
+            <div style="padding-left:10em;">
+                <pagination page="currentPage" max-size="noOfPages" total-items="totalItems" items-per-page="entryLimit"></pagination>
+            </div>
+        </div>
+        <!---------- edit genre modal ------------------->
+        <div class="modal" id="genreEditModal" role="dialog" ng-controller="UpdateGenreController">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Edit Genre</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <th style="position:relative;left:20px;">
+                                    Genre</th>
+                                <td>
+                                    <input type="hidden" ng-model="editGenreId" name="editGenreId" />
+                                    <input type="text" ng-model="editGenreName" name="editGenreName" style="position:relative;left:0px;" />
+                                </td>
+                            </tr>
+
+                            <tr>
+
+                                <td>
+                                    <input type="button" id="btnEditGenre" value="Update Genre" ng-click="updateGenre()" style="position:relative;left:85px;margin-top:10px;width=50px;" />
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-------------- edit track modal ends -------------->
+
+        <!---------- add Genre modal ------------------->
+        <div class="modal" id="addGenreModal" role="dialog" ng-controller="AddGenreController">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Genre</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <th style="position:relative;left:20px;">
+                                    Genre</th>
+                                <td>
+
+                                    <input type="text" ng-model="genreName" name="genreName" style="position:relative;left:0px;" />
+                                </td>
+                            </tr>
+
+                            <tr>
+
+                                <td>
+                                    <input type="button" id="btnAddGenre" value="Add Genre" ng-click="saveGenre();" style="position:relative;left:85px;margin-top:10px;width=50px;" />
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-------------- Add Genre modal ends -------------->
+    </div>
+
+
+
+
+</body>
+
+</html>

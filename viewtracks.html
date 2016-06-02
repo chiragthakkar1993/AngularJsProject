@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+    <!-- JS Libraries -->
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js">
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.min.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js" type="text/javascript"></script>
+
+    <script src="js/services.js"></script>
+    <script src="js/application.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+    <style>
+        table {
+            table-layout: fixed;
+            width: 100px;
+        }
+        
+        rating {
+            color: #a9a9a9;
+            margin: 0;
+            padding: 0;
+        }
+        
+        ul.rating {
+            display: inline-block;
+        }
+        
+        .rating li {
+            list-style-type: none;
+            display: inline-block;
+            padding: 1px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .rating .filled {
+            color: red;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div ng-controller="MainCtrl">
+        <div>
+            <table align="center" border="0" height="50%" class="table">
+                <tr>
+                    <td style="text-align: center;" colspan="2">
+                        <label style="font-size:25px;font-family:comic sans ms;font-weight:bold;">Music Tracks</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="2">
+                        <input type="search" ng-model="search.title" style="width:200px;" placeholder="Search Title">
+                    </td>
+                </tr>
+                <tr data-target="#myEditModal" data-toggle="modal" ng-repeat="track in filtered = trackInfo | filter:search | startFrom:(currentPage-1)*entryLimit | limitTo:entryLimit" style="cursor:pointer;" ng-click="invoke(track.id,track.title,track.genres,track.rating)">
+                    <td style="color:black;font-family:comic sans ms;font-size:15px;position:relative;left:25em;">{{track.title}} [
+                        <div style="display:inline-block" ng-repeat="gen in track.genres ">
+                            {{gen.name}}
+                            <div style="display:inline-block" ng-if="!$last">&nbsp; | &nbsp;</div>
+                        </div>
+                        ]
+
+                    </td>
+                    <td>
+                        <div style="display:inline-block;position:relative;right:-25em;" star-rating rating-value="track.rating" max="5"></div>
+                    </td>
+
+                </tr>
+
+
+
+
+
+                <tr>
+                    <td align="center" colspan="2" ng-controller="AddTrackController">
+                        <input type="button" id="btnAdd" data-target="#addTrackModal" data-toggle="modal" value="Add New Track" style="width:200px;">
+
+                        <!---------- add track modal ------------------->
+                        <div class="modal fade" id="addTrackModal" role="dialog">
+                            <div class="modal-dialog">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Add New Track</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table>
+                                            <tr>
+                                                <th>
+                                                    Title</th>
+                                                <td>
+                                                    <input type="text" ng-model="title" name="txtTitle" style="margin-top:2%;margin-left:15px;" />
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>
+                                                    Genre</th>
+                                                <td>
+                                                    <select multiple ng-model="genre" ng-options="value.name for value in genreInfo" style="margin-top:5%;margin-left:15px;" />
+
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <th>
+                                                    Rating</th>
+                                                <td>
+                                                    <select name="ddRating" ng-model="rating" style="margin-top:5%;margin-left:15px;">
+                                                        <option value="1">1
+                                                        </option>
+                                                        <option value="2">2
+                                                        </option>
+                                                        <option value="3">3
+                                                        </option>
+                                                        <option value="4">4
+                                                        </option>
+                                                        <option value="5">5
+                                                        </option>
+
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                </td>
+                                                <td>
+                                                    <input type="button" id="btnAddNewTrack" ng-click="saveTrack();" value="submit" style="margin-top:5%;position: relative;left: 15px" />
+                                                </td>
+                                                <td>
+                                                    <input type="reset" value="cancel" style="margin-left:132%;margin-top:5%" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!---------- add track modal ends ------------------->
+                    </td>
+                </tr>
+
+
+
+            </table>
+            <div style="padding-left:10em;">
+                <pagination page="currentPage" max-size="noOfPages" total-items="totalItems" items-per-page="entryLimit"></pagination>
+            </div>
+        </div>
+        <!---------- edit track modal ------------------->
+        <div class="modal" id="myEditModal" role="dialog" ng-controller="UpdateTrackController">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Edit Track</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <th>
+                                    Title</th>
+                                <td>
+                                    <input type="hidden" ng-model="editId" name="editId" />
+                                    <input type="text" ng-model="editTitle" name="editTitle" style="margin-top:2%;" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="padding-top:10px;">
+                                    Genres</th>
+                            </tr>
+
+                            <tr>
+
+                                <td style="padding-top:5%;padding-bottom:5%;">
+
+                                    <select multiple ng-multiple="true" ng-model="selectedGenres" ng-options="value.name for value in genreInfo track by value.id" style="margin-top:5%;margin-left:50px;" />
+
+
+                                    <br/>
+                                </td>
+                            </tr>
+                            <!--
+                            <tr ng-controller="AddGenreController">
+                                <td>
+                                    <input type="text" ng-model="genreName" id="txtAddNewGenre" style="margin-top:1%;position:relative;left:50px;" />
+                                </td>
+                                <td>
+                                    <input type="button" id="btnAddNewGenre" ng-click="saveGenre();" value="Add Genre" style="position:relative;left: 175px;" />
+                                </td>
+                            </tr>
+                        -->
+                            <tr>
+                                <th style="margin-top:20%;">
+                                    Rating</th>
+                                <td>
+
+                                    <select ng-model="editRating" ng-options="value for value in values" style="margin-top:20%;" />
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                    <input type="button" id="updateTrack" value="Update" ng-click="updateTrack();" style="margin-top:5%;margin-left:10em;width=50px;" />
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-------------- edit track modal ends -------------->
+
+        <!---------- add Genre modal ------------------->
+        <div class="modal" id="addGenreModal" role="dialog" ng-controller="AddGenreController">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Genre</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <th>
+                                    Genre</th>
+                                <td>
+
+                                    <input type="text" ng-model="genreName" name="genreName" style="position:relative;left:20px;" />
+                                </td>
+                            </tr>
+
+                            <tr>
+
+                                <td>
+                                    <input type="button" id="btnAddGenre" value="Add Genre" ng-click="saveGenre();" style="margin-top:5%;margin-left:10em;width=50px;" />
+                                </td>
+
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-------------- Add Genre modal ends -------------->
+    </div>
+
+
+
+
+</body>
+
+</html>
